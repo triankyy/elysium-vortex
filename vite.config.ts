@@ -6,6 +6,14 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   server: {
-    allowedHosts: ["neatly-discrete-titmouse.ngrok-free.app"]
+    allowedHosts: ["neatly-discrete-titmouse.ngrok-free.app"],
+    // cors: false
+    proxy: {
+      '/api': {
+        target: 'https://script.google.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      }
+    }
   }
 })

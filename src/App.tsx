@@ -1,4 +1,39 @@
+import axios from "axios";
+import { useForm } from "react-hook-form";
+
+interface KritikSaran {
+  kritik: string
+  saran: string
+}
+
 export default function App() {
+  const { register, handleSubmit, formState: { errors, isLoading }, } = useForm<KritikSaran>()
+
+  function onSubmit(formData: KritikSaran): void {
+    const data = JSON.stringify({
+      "kritik": formData.kritik,
+      "saran": formData.saran
+    });
+
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: '/api/import.meta.env.VITE_URL',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
+
+    axios.request(config)
+      .then((response) => {
+        alert(response.data.message)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   return (
     <div className="w-full h-screen bg-[url(/background.png)] bg-center bg-cover flex items-center justify-center">
       <div className="max-w-2xl m-auto p-5 w-full">
@@ -10,30 +45,37 @@ export default function App() {
             </h1>
           </div>
 
-          <div className="p-5">
-            <fieldset className="fieldset mt-5">
-              <legend className="fieldset-legend">Kritik</legend>
-              <textarea
-                className="textarea h-24 w-full"
-                placeholder="Ketik disini"
-                required={true}
-              ></textarea>
-              <div className="label">Wajib diisi</div>
-            </fieldset>
-            <fieldset className="fieldset mt-5">
-              <legend className="fieldset-legend">Saran</legend>
-              <textarea
-                className="textarea h-24 w-full"
-                placeholder="Ketik disini"
-                required={true}
-              ></textarea>
-              <div className="label">Wajib diisi</div>
-            </fieldset>
+          <form onSubmit={handleSubmit(onSubmit)}>
 
-            <button className="btn bg-gradient-to-r from-violet-500 to-blue-500 mt-5 w-full text-white">
-              Kirim
-            </button>
-          </div>
+            <div className="p-5">
+              <fieldset className="fieldset mt-5">
+                <legend className="fieldset-legend">Kritik</legend>
+                <textarea
+                  className="textarea h-24 w-full"
+                  placeholder="Ketik disini"
+                  {...register("kritik", { required: true })}
+                ></textarea>
+                {errors.kritik?.type === "required" && (
+                  <div className="label text-red-500">Kolom kritik wajib diisi</div>
+                )}
+              </fieldset>
+              <fieldset className="fieldset mt-5">
+                <legend className="fieldset-legend">Saran</legend>
+                <textarea
+                  className="textarea h-24 w-full"
+                  placeholder="Ketik disini"
+                  {...register("saran", { required: true })}
+                ></textarea>
+                {errors.saran?.type === "required" && (
+                  <div className="label text-red-500">Kolom saran wajib diisi</div>
+                )}
+              </fieldset>
+
+              <button className="btn bg-gradient-to-r from-violet-500 to-blue-500 mt-5 w-full text-white" disabled={isLoading}>
+                {isLoading ? "Loading..." : "Kirim"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

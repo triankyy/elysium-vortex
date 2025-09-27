@@ -78,6 +78,9 @@ function doPost(e) {
  */
 function createJsonResponse(data, statusCode = 200) {
   const output = ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader("Access-Control-Allow-Origin", "*")
+    .setHeader("Access-Control-Allow-Methods", "POST")
+    .setHeader("Access-Control-Allow-Headers", "Content-Type");
   return output;
 }
