@@ -13,8 +13,6 @@ export default function App() {
   async function onSubmit(formData: KritikSaran): Promise<void> {
     setLoading(true)
     const url = import.meta.env.DEV ? `/api/${import.meta.env.VITE_URL}` : `https://script.google.com/${import.meta.env.VITE_URL}`
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
     const data = JSON.stringify({
       "kritik": formData.kritik,
       "saran": formData.saran
@@ -22,7 +20,9 @@ export default function App() {
 
     const requestOptions: RequestInit = {
       method: "POST",
-      headers: headers,
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
       body: data,
       redirect: "follow"
     };
