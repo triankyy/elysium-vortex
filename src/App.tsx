@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -13,25 +12,26 @@ export default function App() {
 
   async function onSubmit(formData: KritikSaran): Promise<void> {
     setLoading(true)
+    const url = import.meta.env.DEV ? `/api/${import.meta.env.VITE_URL}` : `https://script.google.com/${import.meta.env.VITE_URL}`
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
     const data = JSON.stringify({
       "kritik": formData.kritik,
       "saran": formData.saran
     });
 
-    const config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: import.meta.env.DEV ? `/api/${import.meta.env.VITE_URL}` : `https://script.google.com/${import.meta.env.VITE_URL}`,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: data
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: headers,
+      body: data,
+      redirect: "follow"
     };
 
     try {
-      const response = await axios.request(config)
+      const response = await fetch(url, requestOptions)
+      const responseData = await response.json()
       setLoading(false)
-      alert(response.data.message)
+      alert(responseData.message)
       reset()
     } catch (error: unknown) {
       console.log(error)
