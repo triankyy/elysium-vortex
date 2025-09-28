@@ -21,7 +21,7 @@ export default function App() {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: `/api/${import.meta.env.VITE_URL}`,
+      url: import.meta.env.DEV ? `/api/${import.meta.env.VITE_URL}` : `https://script.google.com/${import.meta.env.VITE_URL}`,
       headers: {
         'Content-Type': 'application/json'
       },
