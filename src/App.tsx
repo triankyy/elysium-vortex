@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface KritikSaran {
@@ -7,9 +8,11 @@ interface KritikSaran {
 }
 
 export default function App() {
-  const { register, handleSubmit, formState: { errors, isLoading }, } = useForm<KritikSaran>()
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<KritikSaran>()
+  const [loading, setLoading] = useState<boolean>(false)
 
-  function onSubmit(formData: KritikSaran): void {
+  async function onSubmit(formData: KritikSaran): Promise<void> {
+    setLoading(true)
     const data = JSON.stringify({
       "kritik": formData.kritik,
       "saran": formData.saran
@@ -18,20 +21,25 @@ export default function App() {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: '/api/import.meta.env.VITE_URL',
+      url: `/api/${import.meta.env.VITE_URL}`,
       headers: {
         'Content-Type': 'application/json'
       },
       data: data
     };
 
-    axios.request(config)
-      .then((response) => {
-        alert(response.data.message)
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const response = await axios.request(config)
+      setLoading(false)
+      alert(response.data.message)
+      reset()
+    } catch (error: unknown) {
+      console.log(error)
+      setLoading(false)
+      alert("Terjadi kesalahan")
+      reset()
+    }
+
   }
 
   return (
@@ -71,8 +79,13 @@ export default function App() {
                 )}
               </fieldset>
 
-              <button className="btn bg-gradient-to-r from-violet-500 to-blue-500 mt-5 w-full text-white" disabled={isLoading}>
-                {isLoading ? "Loading..." : "Kirim"}
+              <button className="btn bg-gradient-to-r from-violet-500 to-blue-500 mt-5 w-full text-white disabled:from-gray-500 disabled:to-zinc-600" disabled={loading}>
+                {loading ? (
+                  <div className="flex flex-row gap-2">
+                    Mohon tunggu
+                    <span className="loading loading-dots loading-xs"></span>
+                  </div>
+                ) : "Kirim"}
               </button>
             </div>
           </form>
